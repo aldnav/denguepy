@@ -32,19 +32,22 @@ def show_help(command=None):
 
 
 def simulate():
+    """
+    Read and verify the config
+    Initialize agents and managers
+    Initialize environment and simulate
+    """
     # read the config file
     assert settings.config['time_steps'] != 0
     assert settings.config['no_of_persons'] != 0
     assert settings.config['no_of_mosquitoes'] != 0
 
+    # initialize agents and managers
     person_mgr = init_persons(settings.config['no_of_persons'])
     mosquito_mgr = init_mosquitoes(settings.config['no_of_mosquitoes'])
-    assert person_mgr is not None
-    assert mosquito_mgr is not None
-    # TODO init_environment
-    # person_mgr.run()
-    # mosquito_mgr.run()
+    # initialize environment
     environment = Environment(person_mgr=person_mgr, mosquito_mgr=mosquito_mgr)
+    # simulate the environment
     environment.simulate()
 
 
