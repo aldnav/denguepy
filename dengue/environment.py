@@ -6,8 +6,12 @@ import uuid
 import glob
 import core.environment
 import settings
+from datetime import datetime
 
-output_file = "/".join(glob.glob(__file__)[0].split('/')[:-1]) + "/results/results-" + str(uuid.uuid4()) + ".csv"
+now = datetime.now()
+file_name = now.isoformat()
+
+output_file = "/".join(glob.glob(__file__)[0].split('/')[:-1]) + "/results/" + str(file_name) + "-results.csv"
 logging.basicConfig(filename=output_file, level=logging.WARNING, format='%(message)s')
 
 
@@ -25,6 +29,7 @@ class Environment(core.environment.Environment):
             person.environment = self
         for mosquito in self.mosquito_mgr.queue:
             mosquito.environment = self
+        self.current_time_step = 0
 
     def simulate(self):
         self.log_headers()
@@ -33,12 +38,14 @@ class Environment(core.environment.Environment):
         for time_step in xrange(1, time_steps+1):
             print "Simulating timestep", time_step,"..."
             # self.display_stats(time_step)
+            self.current_time_step = time_step        # rough implementation of timeliness > models
             self.log_results(time_step)
             self.mosquito_mgr.run()
             self.person_mgr.run()
             print "\t\t...done."
         # prompt for output results
         print "Results saved to ", output_file
+        self.save_config()
 
     def display_stats(self, time_step):
         prompt = """
@@ -73,3 +80,7 @@ class Environment(core.environment.Environment):
             self.mosquito_mgr.count_susceptible(), self.mosquito_mgr.count_infected()  # mosquito SI
         )
         logging.warning(line)
+
+    def save_config(self):
+        import shutil
+        shutil.copy2('.season_config.json', "/".join(glob.glob(__file__)[0].split('/')[:-1]) + "/results/" + str(file_name) + "-season_config.json")

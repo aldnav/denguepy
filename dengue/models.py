@@ -5,6 +5,7 @@ import random
 from core.models import Agent
 from core.models import states as states
 import settings
+import seasonality
 
 
 class Person(Agent):
@@ -89,8 +90,11 @@ class Mosquito(Agent):
         Choose random people to bite
         """
         # TODO change to one person only
-        person_infection_probability = settings.config['person_infection_probability']
-        mosquito_infection_probability = settings.config['mosquito_infection_probability']
+        # person_infection_probability = settings.config['person_infection_probability']
+        # mosquito_infection_probability = settings.config['mosquito_infection_probability']
+        # TODO rough implementation of timely update of params
+        person_infection_probability = seasonality.infection_probability_map[self.environment.current_time_step][1]
+        mosquito_infection_probability = seasonality.infection_probability_map[self.environment.current_time_step][2]
         person_to_bite = random.choice(self.environment.person_mgr.queue)
         # TODO move this to a disease handler probably
         # CASE: Person is not infected yet
